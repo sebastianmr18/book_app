@@ -1,5 +1,6 @@
 package com.example.bd_app.view.fragment
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import com.example.bd_app.viewmodel.BookViewModel
 
 class HomeBookFragment : Fragment() {
     private lateinit var binding: FragmentHomeBookBinding
+    private lateinit var mediaPlayer: MediaPlayer
     private val bookViewModel: BookViewModel by viewModels()
 
     override fun onCreateView(
@@ -31,7 +33,37 @@ class HomeBookFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         controlator()
         observerViewModel()
+        reproducirAudio()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        // Reproducir el audio cuando el fragmento esté visible
+        mediaPlayer.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Pausar el audio cuando el fragmento no esté visible
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Liberar recursos del MediaPlayer al destruir el fragmento
+        mediaPlayer.release()
+    }
+
+    private fun reproducirAudio() {
+        mediaPlayer = MediaPlayer.create(requireContext(), R.raw.audio)
+
+        mediaPlayer.start()
+
+        mediaPlayer.setOnCompletionListener {
+            mediaPlayer.release()
+        }
     }
 
     private fun controlator() {
